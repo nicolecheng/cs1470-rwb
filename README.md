@@ -26,9 +26,9 @@ TBD
 
 
 ## Additional Information
-CSCI1470 Fall 2019
-Project: Final Project
-Due: Tues Dec 10 2019
+CSCI1470 Fall 2019 \
+Project: Final Project \
+Due: Tues Dec 10 2019 \
 
 
 ## Contributors
