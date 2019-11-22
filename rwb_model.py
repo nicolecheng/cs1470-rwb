@@ -2,7 +2,7 @@ import os
 import numpy as np
 import tensorflow as tf
 import numpy as np
-from preprocess import *
+from preprocessing import *
 import sys
 
 class RWB(tf.keras.Model):
@@ -131,7 +131,7 @@ def test(model, test_inputs, test_labels):
 def main():
 
     # load train and test data
-    train_inputs, train_labels, test_inputs, test_labels = preprocess.get_data()
+    train_inputs, train_labels, test_inputs, test_labels = preprocessing.get_data()
     
     # create Model
     m = RWB()
