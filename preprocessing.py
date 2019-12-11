@@ -2,6 +2,7 @@ import cv2
 import os
 import numpy as np
 import xml.etree.ElementTree as ET
+import tensorflow as tf
 #import tensorflow.keras.preprocessing.image.ImageDataGenerator as DataGenerator
 
 # if ran
@@ -54,9 +55,17 @@ def get_data(datagen=False, bs=0):
     for c in class_images:
         print(c.shape)
     '''
+
+    # shuffle
+    indices = tf.random.shuffle(range(len(images)))
+    images = tf.gather(images, indices)
+    one_hots = tf.gather(one_hots, indices)
+
+    # split into training and testing
     num_inputs = len(images)
     print("number of images:", num_inputs)
     num_train = int(round(num_inputs * 0.6))
+
     train_inputs, test_inputs = images[:num_train], images[num_train:]
     train_labels, test_labels = one_hots[:num_train], one_hots[num_train:]
 
