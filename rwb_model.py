@@ -92,8 +92,8 @@ class RWB(tf.keras.Model):
         return loss
 
     def accuracy(self, logits, labels):
-        print("preds of first 10: ", tf.argmax(logits, 1))[:10]
-        print("labels of first 10:", tf.argmax(labels, 1))[:10]
+        print("preds of first 10: ", tf.argmax(logits, 1)[:10])
+        print("labels of first 10:", tf.argmax(labels, 1)[:10])
         correct_predictions = tf.equal(tf.argmax(logits, 1), tf.argmax(labels, 1))
         print(correct_predictions)
         return tf.reduce_sum(tf.cast(correct_predictions, tf.float32))

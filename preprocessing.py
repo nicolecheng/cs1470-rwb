@@ -19,7 +19,7 @@ def get_data(datagen=False, bs=0):
         annotation_class_path = "Annotation/" + annotation_class_path
         image_paths = os.listdir(images_class_path)
         annotation_paths = os.listdir(annotation_class_path)
-        zipped = zip(image_paths[:10], annotation_paths[:10])
+        zipped = zip(image_paths, annotation_paths)
         for image_path, annotation_path in zipped:
             image_path = images_class_path + "/" + image_path
             annotation_path = annotation_class_path + "/" + annotation_path
