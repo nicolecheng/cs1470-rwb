@@ -11,11 +11,15 @@ def get_data(datagen=False, bs=0):
     images = []
     one_hots = []
 
+    all_image_paths = []
+    dog_breeds = []
+
     # Reading images, annotations in each class directory
     annotation_class_paths = os.listdir("Annotation")
     images_class_paths = os.listdir("Images")
-    zipped = zip(annotation_class_paths, images_class_paths)
-    for i, (images_class_path, annotation_class_path) in enumerate(zipped):
+    zipped_classes = zip(annotation_class_paths, images_class_paths)
+    for i, (images_class_path, annotation_class_path) in enumerate(zipped_classes):
+        dog_breeds.append(images_class_path.split("-")[-1])
         images_class_path = "Images/" + images_class_path
         annotation_class_path = "Annotation/" + annotation_class_path
         image_paths = os.listdir(images_class_path)
@@ -23,6 +27,7 @@ def get_data(datagen=False, bs=0):
         zipped = zip(image_paths, annotation_paths)
         for image_path, annotation_path in zipped:
             image_path = images_class_path + "/" + image_path
+            all_image_paths.append(image_path)
             annotation_path = annotation_class_path + "/" + annotation_path
             # Reading image
             image = cv2.imread(image_path)
@@ -47,7 +52,8 @@ def get_data(datagen=False, bs=0):
     images = np.array(images).astype(np.float32)/255
     one_hots = np.array(one_hots).astype(np.float32)
     images_per_class = map(len, images)
-
+    
+    
     print("shape of one hots: ", one_hots.shape)
     print("Shape of imaegs: ", images.shape)
     print("image shape: ", images[0].shape)
@@ -60,15 +66,15 @@ def get_data(datagen=False, bs=0):
     indices = tf.random.shuffle(range(len(images)))
     images = tf.gather(images, indices)
     one_hots = tf.gather(one_hots, indices)
+    image_paths = tf.gather(all_image_paths, indices)
 
     # split into training and testing
     num_inputs = len(images)
-    print("number of images:", num_inputs)
+    #print("number of images:", num_inputs)
     num_train = int(round(num_inputs * 0.6))
 
     train_inputs, test_inputs = images[:num_train], images[num_train:]
     train_labels, test_labels = one_hots[:num_train], one_hots[num_train:]
-
 
 
 # Input an image, return a randomly augmented one,
@@ -79,4 +85,7 @@ def get_data(datagen=False, bs=0):
         #return dg.flow(train_inputs, train_labels, batch_size=bs), test_inputs, test_labels
         return
         
-    return train_inputs, train_labels, test_inputs, test_labels
+    return train_inputs, train_labels, test_inputs, test_labels, dog_breeds
+
+if __name__=="__main__":
+    get_data()
