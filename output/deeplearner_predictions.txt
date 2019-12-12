@@ -1,0 +1,4 @@
+preds
+tf.Tensor([86 86 27], shape=(3,), dtype=int64)Predicted: standard_schnauzer                 Actual: amy
+Predicted: standard_schnauzer                 Actual: brian
+Predicted: Bedlington_terrier                 Actual: zach
