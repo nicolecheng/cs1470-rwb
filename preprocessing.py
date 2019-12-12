@@ -67,7 +67,6 @@ def get_data(datagen=False, bs=0):
     images = tf.gather(images, indices)
     one_hots = tf.gather(one_hots, indices)
     image_paths = tf.gather(all_image_paths, indices)
-
     # split into training and testing
     num_inputs = len(images)
     #print("number of images:", num_inputs)
@@ -79,13 +78,29 @@ def get_data(datagen=False, bs=0):
 
 # Input an image, return a randomly augmented one,
 # with l/r flip, contrast, brightness, jittering, 
-    if datagen == True: #return datagen object instead of training stuff
+    if datagen == True: #return datagen obct instead of training stuff
         #dg = DataGenerator(featurewise_center=True, featurewise_std_normalization=True, zca_whitening=True, rotation_range=20, width_shift_range=.05, height_shift_range=.05, horizontal_flip=True)
         #dg.fit(train_inputs)
         #return dg.flow(train_inputs, train_labels, batch_size=bs), test_inputs, test_labels
         return
         
     return train_inputs, train_labels, test_inputs, test_labels, dog_breeds
+
+def get_deep_learners_data():
+    print("getting data")
+    image_class_paths = os.listdir("people")
+    images = []
+    names = []
+    for i in image_class_paths:
+        image_path = os.path.join("people",i)
+        names.append(i.split(".")[0])
+        image = cv2.imread(image_path)
+        image = np.array(image).astype(np.float32)/255
+        print(image.shape)
+        images.append(image)
+    return names,images
+
+
 
 if __name__=="__main__":
     get_data()

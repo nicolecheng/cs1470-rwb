@@ -2,8 +2,9 @@ import os
 import numpy as np
 import tensorflow as tf
 import numpy as np
-from preprocessing import get_data
+from preprocessing import get_data, get_deep_learners_data
 import sys
+import argparse
 from matplotlib import pyplot as plt
 
 global dog_breeds
@@ -49,7 +50,6 @@ class RWB(tf.keras.Model):
 
 
     def call(self, inputs):
-
         logits = self.model(inputs)
         # print("final output shape", logits.shape)
         return logits
@@ -100,10 +100,12 @@ def train(model, train_inputs, train_labels):
         gradients = tape.gradient(loss, model.trainable_variables)
         model.optimizer.apply_gradients(zip(gradients, model.trainable_variables))
 
+        
 
 def test(model, test_inputs, test_labels):
 
     global dog_breeds
+
     num_inputs = test_inputs.shape[0]
     start = 0
     end = model.batch_size
@@ -124,14 +126,11 @@ def test(model, test_inputs, test_labels):
         batch_accuracy = model.accuracy(predictions, cur_label_batch)
         total_accuracy += batch_accuracy
 
-        #viz_inputs, viz_labels = cur_input_batch, cur_label_batch#test_inputs[:10], test_labels[:10]
-        #visualize_results(viz_inputs, predictions, viz_labels)#m.call(viz_inputs), viz_labels)
-
         all_predictions += list(tf.argmax(predictions, axis=1).numpy())
 
+
     test_labels = list(tf.argmax(test_labels, axis=1).numpy())
-    #print(len(all_predictions),len(test_labels))
-    
+
     f = open(os.path.join("output","test_results.txt"), "w")
     for i in range(len(all_predictions)):
         predicted = str(dog_breeds[all_predictions[i]])
@@ -174,19 +173,53 @@ def visualize_results(image_inputs, probabilities, image_labels):
         
 def main():
 
+    parser = argparse.ArgumentParser(description='DCGAN')
+    
+    parser.add_argument('--restore-checkpoint', action='store_true',
+                        help='Use this flag if you want to resuming training from a previously-saved checkpoint')
+
+    parser.add_argument('--deep-learners', default=False, action='store_true',
+                        help='Use in conjunction w checkpt if want to run the model on photos of DL prof and HTAs')
+
+
+    args = parser.parse_args()
+
+
     global dog_breeds
     # create Model
     m = RWB()
-    restore = False
+    restore = args.restore_checkpoint
     print("G:", tf.test.is_gpu_available())
 
     checkpoint_dir = "./checkpoints"
     checkpoint = tf.train.Checkpoint(m=m)
     manager = tf.train.CheckpointManager(checkpoint, checkpoint_dir, max_to_keep=3)
+
     train_inputs, train_labels, test_inputs, test_labels, dog_breeds = get_data(m.batch_size)
+
+    if args.deep_learners and restore:
+        deep_learner_names, deep_learner_images = get_deep_learners_data()
+        print("num names", deep_learner_names)
+        print("num images", len(deep_learner_images))
+        f = open(os.path.join("output","deeplearner_predictions.txt"), "w")
+        deep_learner_images = tf.convert_to_tensor(deep_learner_images)
+        probs = m.call(deep_learner_images)
+        preds = tf.argmax(probs,axis=1)
+        print("PREDS", preds)
+        f.write("preds\n" + str(preds))
+        for i in range(len(preds)):
+            predicted = str(dog_breeds[preds[i]])
+            actual = deep_learner_names[i]
+            spaces = (35 - len(predicted)) * " "
+            f.write("Predicted: "+predicted+spaces+"Actual: "+actual+"\n")
         
+        f.close()
+        return
+
+
     if restore:
         checkpoint.restore(manager.latest_checkpoint)
+
     else:
     # load train and test data
 
@@ -199,6 +232,8 @@ def main():
     print("Testing...")
     acc = test(m, test_inputs, test_labels)
     print("model received an accuracy of: %s" % str(acc))
+
+
 
 
 
