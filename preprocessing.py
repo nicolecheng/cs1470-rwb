@@ -67,27 +67,27 @@ def get_data(datagen=False, bs=0):
     images = tf.gather(images, indices)
     one_hots = tf.gather(one_hots, indices)
     image_paths = tf.gather(all_image_paths, indices)
+
     # split into training and testing
     num_inputs = len(images)
-    #print("number of images:", num_inputs)
     num_train = int(round(num_inputs * 0.6))
 
     train_inputs, test_inputs = images[:num_train], images[num_train:]
     train_labels, test_labels = one_hots[:num_train], one_hots[num_train:]
 
 
-# Input an image, return a randomly augmented one,
-# with l/r flip, contrast, brightness, jittering, 
+    # NOTE: we didn't end up using this, but this is what we worked on for data augmentation
+    # Input an image, return a randomly augmented one,
+    # with l/r flip, contrast, brightness, jittering, 
     if datagen == True: #return datagen obct instead of training stuff
         #dg = DataGenerator(featurewise_center=True, featurewise_std_normalization=True, zca_whitening=True, rotation_range=20, width_shift_range=.05, height_shift_range=.05, horizontal_flip=True)
         #dg.fit(train_inputs)
-        #return dg.flow(train_inputs, train_labels, batch_size=bs), test_inputs, test_labels
+        #return dg.flow(train_inputs, train_labels, batch_size=bs), test_inputs, test_labels, dog_breeds
         return
-        
+    
     return train_inputs, train_labels, test_inputs, test_labels, dog_breeds
 
 def get_deep_learners_data():
-    print("getting data")
     image_class_paths = os.listdir("people")
     images = []
     names = []
@@ -96,7 +96,6 @@ def get_deep_learners_data():
         names.append(i.split(".")[0])
         image = cv2.imread(image_path)
         image = np.array(image).astype(np.float32)/255
-        print(image.shape)
         images.append(image)
     return names,images
 
